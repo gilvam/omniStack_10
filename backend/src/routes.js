@@ -3,6 +3,13 @@ const DevController = require('./controllers/DevController');
 
 const routes = Router();
 
+// index -> show list
+// show -> show only one ( details )
+// store -> create
+// update -> ...
+// destroy -> delete
+
+routes.get('/devs', DevController.index);
 routes.post('/devs', DevController.store);
 
 module.exports = routes;
