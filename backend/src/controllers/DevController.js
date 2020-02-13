@@ -1,5 +1,6 @@
 const axios = require('axios');
 const Dev = require('../models/Dev');
+const parseStringAsArray = require('../util/parseStringAsArray');
 
 module.exports = {
 
@@ -14,7 +15,7 @@ module.exports = {
     let dev = await Dev.findOne({ github_username }); // pesquisa se existe usuário dev cadastrado
 
     if (!dev) {
-      const techsArray = techs.split(',').map(tech => tech.trim());
+      const techsArray = parseStringAsArray(techs);
       const location = {
         type: 'Point',
         coordinates: [longitude, latitude],
@@ -36,3 +37,10 @@ module.exports = {
     return response.json(dev);
   }
 };
+
+
+// index -> show list
+// show -> show only one ( details )
+// store -> create
+// update -> ...
+// destroy -> delete
