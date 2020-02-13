@@ -1,13 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
+const { Router } = require('express');
+const DevController = require('./controllers/DevController');
 
-const app = express();
-mongoose.connect('mongodb+srv://admin:admin@cluster0-miarq.mongodb.net/week10?retryWrites=true&w=majority', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const routes = Router();
 
-app.use(express.json()); // entender requisições com o formato JSON
+routes.post('/devs', DevController.store);
+
+module.exports = routes;
+
 
 /**
  * tipos de parâmetro:
@@ -26,9 +25,3 @@ app.use(express.json()); // entender requisições com o formato JSON
  *        desc: dados apra criação ou alteração de um registro
  *        ex:
  */
-
-app.get('/', (request, response) => {
-  response.json({ message: 'Hellow OmniStack' });
-});
-
-app.listen(3333);
