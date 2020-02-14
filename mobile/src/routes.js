@@ -16,16 +16,17 @@ function Routes() {
                            backgroundColor: '#7D40E7',
                          },
                          headerTintColor: '#fff',
+                         headerBackTitleVisible: false,
                          headerTitleStyle: {
                            fontSize: 16,
                          },
                        } }
 
       >
-        <Stack.Screen name="Main" options={ { title: 'Main - Início' } }>
+        <Stack.Screen name="Main" options={ { title: 'devRadar' } }>
           { props => <Main { ...props }/> }
         </Stack.Screen>
-        <Stack.Screen name="Profile" options={ { title: 'Profile - Perfil' } }>
+        <Stack.Screen name="Profile" options={ { title: 'github profile' } }>
           { props => <Profile { ...props }/> }
         </Stack.Screen>
       </Stack.Navigator>
