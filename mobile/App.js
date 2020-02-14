@@ -1,22 +1,15 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import 'react-native-gesture-handler';
+import Routes from './src/routes';
+import { StatusBar } from 'react-native-web';
 
-export default function App() {
-
-  console.log('oi');
-
+function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your xx!</Text>
-    </View>
+    <>
+      <StatusBar barSyle="light-content" backgroundColor="#7D40E7"/>
+      <Routes/>
+    </>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
