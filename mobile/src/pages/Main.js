@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { Button, View, Text, TextInput, TouchableOpacity } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
-import { StyleSheet, Image } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import MapView, { Callout, Marker } from 'react-native-maps';
-import { requestPermissionsAsync, getCurrentPositionAsync } from 'expo-location';
+import { getCurrentPositionAsync, requestPermissionsAsync } from 'expo-location';
 import { MaterialIcons } from '@expo/vector-icons';
+
+import api from '../services/api';
 
 function Main({ navigation }) {
 
+  const [devs, setDevs] = useState([]);
   const [currentRegion, setCurrentRegion] = useState(null);
+  const [techs, setTechs] = useState('');
 
   useEffect(() => {
     async function loadInitialPosition() {
@@ -18,9 +19,6 @@ function Main({ navigation }) {
       if (granted) {
         const { coords } = await getCurrentPositionAsync({ enableHighAccuracy: true });
         const { latitude, longitude } = coords;
-
-        console.log('coords: ', coords);
-
         setCurrentRegion({ latitude, longitude, latitudeDelta: 0.04, longitudeDelta: 0.04 });
       }
     }
@@ -32,24 +30,56 @@ function Main({ navigation }) {
     return null;
   }
 
+  function handleRegionChanged(region) {
+    setCurrentRegion(region);
+  }
+
+  async function loadDevs() {
+    const { latitude, longitude } = currentRegion;
+    const response = await api.get('/search', {
+      params: {
+        latitude,
+        longitude,
+        techs
+      }
+    });
+    setDevs(response.data);
+  }
+
   return (
     <>
-      <MapView style={ styles.map } initialRegion={ currentRegion }>
-        <Marker coordinate={ { latitude: -19.911111, longitude: -44.1111111 } }>
-          <Image style={ styles.avatar }
-                 source={ { uri: 'https://avatars1.githubusercontent.com/u/2046970?s=460&v=4' } }/>
+      <MapView
+        style={ styles.map }
+        initialRegion={ currentRegion }
+        onRegionChangeComplete={ handleRegionChanged }
+      >
+        {
+          devs.map(dev => (
+            <Marker
+              key={ dev._id }
+              coordinate={ {
+                latitude: dev.location.coordinates[1],
+                longitude: dev.location.coordinates[0]
+              } }
+            >
+              <Image
+                style={ styles.avatar }
+                source={ { uri: dev.avatar_url } }/>
 
-          <Callout onPress={ () => {
-            navigation.navigate('Profile', { github_username: 'gilvam' });
-          } }>
-            <View style={ styles.callout }>
-              <Text style={ styles.devName }>Gilvam Mourão</Text>
-              <Text style={ styles.devBio }>bio....</Text>
-              <Text style={ styles.devTechs }>reactJS, ...</Text>
-            </View>
-          </Callout>
+              <Callout
+                onPress={ () => {
+                  navigation.navigate('Profile', { github_username: dev.github_username });
+                } }>
+                <View style={ styles.callout }>
+                  <Text style={ styles.devName }>{ dev.name }</Text>
+                  <Text style={ styles.devBio }>{ dev.bio }</Text>
+                  <Text style={ styles.devTechs }>{ dev.techs.join(', ') }</Text>
+                </View>
+              </Callout>
 
-        </Marker>
+            </Marker>
+          ))
+        }
       </MapView>
 
       <View style={ styles.searchForm }>
@@ -59,9 +89,10 @@ function Main({ navigation }) {
           placeholderTextColor="#999"
           autoCapitalize="words"
           autoCorrect={ false }
+          value={ techs }
+          onChangeText={ setTechs }
         />
-        <TouchableOpacity style={ styles.loadButton } onPress={ () => {
-        } }>
+        <TouchableOpacity style={ styles.loadButton } onPress={ loadDevs }>
           <MaterialIcons name="my-location" size={ 20 } color="#fff"/>
         </TouchableOpacity>
       </View>
@@ -115,7 +146,7 @@ const styles = StyleSheet.create({
     // shadow ios
     shadowColor: '#000',
     shadowOpacity: 0.2,
-    shadowOffset:{
+    shadowOffset: {
       width: 4,
       heigth: 4,
     },
